@@ -28,7 +28,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "TiltshiftHelper"
+            packageName = "TiltShiftHelper"
             packageVersion = "1.0.0"
         }
     }
