@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import state.ApplicationState
 import utils.image.file.dropFileTarget
 import utils.image.file.legalSuffixList
+import view.widget.CommonDialog
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -41,6 +42,11 @@ fun MainScreen(
         ) {
             PreviewContent(state, Modifier.weight(1f))
             ControlContent(state, Modifier.weight(1f))
+        }
+
+
+        if (state.dialogMsg.isNotBlank()) {
+            CommonDialog(state)
         }
     }
 }

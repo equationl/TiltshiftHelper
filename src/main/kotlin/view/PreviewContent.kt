@@ -1,6 +1,7 @@
 package view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,6 @@ fun PreviewContent(
         elevation = 4.dp,
         onClick = {
             state.onClickImgChoose()
-            // TODO 已选择图片则点击查看大图
         },
         enabled = state.rawImg == null
     ) {
@@ -91,7 +91,10 @@ private fun ImgPreview(state: ApplicationState) {
                             end = Offset(x = size.width, y = size.height * (1f - state.bottomPercent))
                         )
                     }
-                },
+                }
+                    .clickable {
+                        state.togglePreviewWindow(true)
+                    },
             )
         }
 

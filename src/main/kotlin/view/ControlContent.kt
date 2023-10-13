@@ -63,7 +63,7 @@ fun ControlContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "色相增益：",
+                    text = "色相：",
                     color = if (state.isFilterImg) Color.Unspecified else Color.LightGray
                 )
                 Row(
@@ -238,10 +238,10 @@ fun ControlContent(
                     checked = state.isUsingSourcePath,
                     onCheckedChange = {
                         state.isUsingSourcePath = it
-                        state.outputPath = if (it) "原路径" else ""
+                        state.outputPath = if (it) "原位置" else ""
                     }
                 )
-                Text("输出至原路径", fontSize = 12.sp)
+                Text("输出至原位置", fontSize = 12.sp)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -49,7 +49,16 @@ class ApplicationState(
     var outputPath by mutableStateOf("")
     var isUsingSourcePath by mutableStateOf(false)
 
+    var dialogTitle by mutableStateOf("")
+    var dialogMsg by mutableStateOf("")
+    var dialogSureBtnText by mutableStateOf("")
+    var dialogCancelBtnText by mutableStateOf("")
+    var onDialogSure: (() -> Unit)? = null
+    var onDialogCloseRequest: (() -> Unit)? = null
+
     var rawImgFile: File? = null
+
+    var isShowPreviewWindow by mutableStateOf(false)
 
 
     fun onClickImgChoose() {
@@ -88,6 +97,14 @@ class ApplicationState(
 
     fun onClickSave() {
         scope.launch {
+            if (!isUsingSourcePath && outputPath.isBlank()) {
+                showDialog(
+                    msg = "请选择保存位置或勾选【输出至原位置】",
+                    sureBtnText = "确定",
+                )
+                return@launch
+            }
+
             if (isFilterImg) {
                 showImg = ImageFilter.hslImage(rawImg!!, saturation, hue, luminance)
             }
@@ -109,7 +126,6 @@ class ApplicationState(
         }
     }
 
-    // FIXME not work!
     fun showTray(
         msg: String,
         title: String = "通知",
@@ -117,5 +133,25 @@ class ApplicationState(
     ) {
         val notification = Notification(title, msg, type)
         trayState.sendNotification(notification)
+    }
+
+    fun showDialog(
+        msg: String,
+        title: String = "",
+        sureBtnText: String = "",
+        cancelBtnText: String = "",
+        onClickSure: () -> Unit = { dialogMsg = "" },
+        onClose: () -> Unit = { dialogMsg = "" }
+    ) {
+        dialogMsg = msg
+        dialogTitle = title
+        dialogSureBtnText = sureBtnText
+        dialogCancelBtnText = cancelBtnText
+        onDialogCloseRequest = onClose
+        onDialogSure = onClickSure
+    }
+
+    fun togglePreviewWindow(isShow: Boolean = true) {
+        isShowPreviewWindow = isShow
     }
 }
