@@ -1,15 +1,14 @@
 package view
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -28,10 +27,16 @@ fun MainScreen() {
     val rawImg = remember { ImageIO.read(File("C:\\Users\\DELL\\Desktop\\test\\test.jpg")) }
     var showImg by mutableStateOf(remember { rawImg })
     var saturation by mutableStateOf(remember { 0.8f })
+    var luminance by mutableStateOf(remember { 0f })
+    var hue by mutableStateOf(remember { 0f })
     var blurRadius by mutableStateOf(remember { 10f })
+    var topPercent by mutableStateOf(remember { 0.3f })
+    var bottomPercent by mutableStateOf(remember { 0.3f })
 
     var isChangeSaturation by remember { mutableStateOf(true) }
     var isBlur by remember { mutableStateOf(true) }
+
+    var isShowGuideLine by remember { mutableStateOf(true) }
 
     MaterialTheme {
         Column(
@@ -42,12 +47,44 @@ fun MainScreen() {
                 shape = RoundedCornerShape(8.dp),
                 elevation = 4.dp,
             ) {
-                Image(
-                    bitmap = showImg.toComposeImageBitmap(),
-                    contentDescription = null,
+                Column(
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        bitmap = showImg.toComposeImageBitmap(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.drawWithContent {
+                            drawContent()
+                            if (isShowGuideLine) {
+                                drawLine(
+                                    color = Color.LightGray,
+                                    start = Offset(x = 0f, y = size.height * topPercent),
+                                    end = Offset(x = size.width, y = size.height * topPercent),
+                                    strokeWidth = 3f
+                                )
+                                drawLine(
+                                    color = Color.Cyan,
+                                    start = Offset(x = 0f, y = size.height * topPercent),
+                                    end = Offset(x = size.width, y = size.height * topPercent)
+                                )
+                                drawLine(
+                                    color = Color.LightGray,
+                                    start = Offset(x = 0f, y = size.height * (1f - bottomPercent)),
+                                    end = Offset(x = size.width, y = size.height * (1f - bottomPercent)),
+                                    strokeWidth = 3f
+                                )
+                                drawLine(
+                                    color = Color.Cyan,
+                                    start = Offset(x = 0f, y = size.height * (1f - bottomPercent)),
+                                    end = Offset(x = size.width, y = size.height * (1f - bottomPercent))
+                                )
+                            }
+                        },
+                    )
+                }
             }
 
             Card(
@@ -65,7 +102,7 @@ fun MainScreen() {
                             isChangeSaturation = it
                         })
                         Text(
-                            text = "饱和度：",
+                            text = "饱和度增益：",
                             color = if (isChangeSaturation) Color.Unspecified else Color.LightGray
                         )
                         Row(
@@ -77,10 +114,69 @@ fun MainScreen() {
                                     saturation = it
                                 },
                                 enabled = isChangeSaturation,
-                                modifier = Modifier.weight(9f)
+                                modifier = Modifier.weight(9f),
+                                valueRange = -1f..1f
                             )
                             Text(
                                 text = saturation.to2fStr(),
+                                color = if (isChangeSaturation) Color.Unspecified else Color.LightGray,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(isChangeSaturation, onCheckedChange = {
+                            isChangeSaturation = it
+                        })
+                        Text(
+                            text = "色相增益：",
+                            color = if (isChangeSaturation) Color.Unspecified else Color.LightGray
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Slider(
+                                value = hue,
+                                onValueChange = {
+                                    hue = it
+                                },
+                                enabled = isChangeSaturation,
+                                modifier = Modifier.weight(9f),
+                                valueRange = -1f..1f
+                            )
+                            Text(
+                                text = hue.to2fStr(),
+                                color = if (isChangeSaturation) Color.Unspecified else Color.LightGray,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(isChangeSaturation, onCheckedChange = {
+                            isChangeSaturation = it
+                        })
+                        Text(
+                            text = "亮度增益：",
+                            color = if (isChangeSaturation) Color.Unspecified else Color.LightGray
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Slider(
+                                value = luminance,
+                                onValueChange = {
+                                    luminance = it
+                                },
+                                enabled = isChangeSaturation,
+                                modifier = Modifier.weight(9f),
+                                valueRange = -1f..1f
+                            )
+                            Text(
+                                text = luminance.to2fStr(),
                                 color = if (isChangeSaturation) Color.Unspecified else Color.LightGray,
                                 modifier = Modifier.weight(1f)
                             )
@@ -115,23 +211,73 @@ fun MainScreen() {
                             )
                         }
                     }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("顶部位置：",)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Slider(
+                                value = topPercent,
+                                onValueChange = {
+                                    isShowGuideLine = true
+
+                                    if (topPercent + bottomPercent < 1f) {
+                                        topPercent = it
+                                    }
+                                    else {
+                                        topPercent = 1f - bottomPercent - 0.01f
+                                    }
+                                },
+                                modifier = Modifier.weight(9f)
+                            )
+                            Text(
+                                topPercent.to2fStr(),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("底部位置：",)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Slider(
+                                value = bottomPercent,
+                                onValueChange = {
+                                    isShowGuideLine = true
+
+                                    bottomPercent = if (topPercent + bottomPercent < 1f) {
+                                        it
+                                    } else {
+                                        1f - topPercent - 0.01f
+                                    }
+                                },
+                                modifier = Modifier.weight(9f)
+                            )
+                            Text(
+                                bottomPercent.to2fStr(),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                     Button(onClick = {
                         scop.launch {
+                            isShowGuideLine = false
+
                             if (isChangeSaturation) {
                                 showImg = ImageFilter.hslImage(rawImg, saturation, 0f, 0f)
                             }
 
                             if (isBlur) {
-//                                val filter = LensBlurFilter().apply {
-//                                    this.radius = blurRadius
-//                                }
-//                                showImg = filter.filter(if (isChangeSaturation) showImg else rawImg, BufferedImage(rawImg.width, rawImg.height, BufferedImage.TYPE_INT_RGB))
-
                                 if (isChangeSaturation) {
-                                    showImg = showImg.blur(blurRadius, 0.3f, 0.3f)
+                                    showImg = showImg.blur(blurRadius, topPercent, bottomPercent)
                                 }
                                 else {
-                                    showImg = rawImg.blur(blurRadius, 0.3f, 0.3f)
+                                    showImg = rawImg.blur(blurRadius, topPercent, bottomPercent)
                                 }
                             }
                         }
