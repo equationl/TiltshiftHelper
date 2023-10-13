@@ -1,4 +1,4 @@
-package utils.image.tilt_shift
+package utils.image.tiltshift
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
